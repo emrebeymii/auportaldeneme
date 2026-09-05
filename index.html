@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AÖF Web Tasarımı ve Kodlama</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <style>
+    :root {
+      --primary-color: #ff6b00;
+      --card-bg: #ffffff;
+      --bg-color: #f4f5f7;
+      --border-color: #e5e7eb;
+      --text-main: #1f2937;
+    }
+
+    [data-theme="dark"] {
+      --card-bg: #1e1e24;
+      --bg-color: #121214;
+      --border-color: #2e2e38;
+      --text-main: #f3f4f6;
+    }
+
+    body {
+      background-color: #111;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    #appFrame {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 932px;
+      background-color: var(--bg-color);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border-radius: 24px;
+    }
+
+    /* Topbar & Safe Areas */
+    .topbar {
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px 16px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 80px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Cards & Components */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+    }
+
+    .info-notice-card {
+      background: linear-gradient(135deg, #ff6b00, #ff8800);
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-card {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .action-card:active {
+      transform: scale(0.96);
+    }
+
+    /* Bottom Nav */
+    .bottomnav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)) 0;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: #888;
+      font-size: 0.75rem;
+      cursor: pointer;
+      width: 25%;
+    }
+
+    .nav-btn i {
+      font-size: 1.35rem;
+    }
+
+    .nav-btn.active {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    /* Modals & Bottom Sheet */
+    .custom-modal {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .custom-modal.active {
+      display: block;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 20px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .form-field {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    /* FORUM STİLLERİ */
+    .forum-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .forum-card:active {
+      transform: scale(0.98);
+    }
+
+    .forum-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), #ff9800);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .forum-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .comment-bubble {
+      background: var(--bg-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+    }
+
+    .max-h-60 {
+      max-height: 250px;
+    }
+
+    .text-truncate-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mobil Çerçeve (Desktop Frame) -->
+  <div id="appFrame">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-title" id="logoBtn">
+        <i class="ph ph-code-block text-primary fs-3"></i>
+        <span>AÖF Web Topluluğu</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="darkToggleBtn" aria-label="Koyu Tema Switcher">
+          <i class="ph ph-moon"></i>
+        </button>
+        <button class="icon-btn position-relative" id="notifBtn" aria-label="Bildirimler">
+          <i class="ph ph-bell"></i>
+          <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ANA İÇERİK ALANI -->
+    <main class="main-content">
+      
+      <!-- TAB 1: ANA SAYFA -->
+      <section id="tab-home" class="tab-pane active">
+        <!-- Kampüs Kartı & Hoşgeldin -->
+        <div class="card info-notice-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-warning text-dark fw-bold"><i class="ph ph-sparkle me-1"></i>AÖF Bilgilendirme</span>
+            <small class="text-white-50">2025-2026</small>
+          </div>
+          <h5 class="fw-bold text-white mb-1">Web Tasarımı ve Kodlama</h5>
+          <p class="text-white-50 small mb-3">Ders notları, sınav tarihleri ve güncel duyurular tek çatı altında.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-light rounded-pill px-3 fw-semibold" onclick="switchTab('tab-courses')">Dersler</button>
+            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="switchTab('tab-forum')">Foruma Git</button>
+          </div>
+        </div>
+
+        <!-- Hızlı Erişim Grid -->
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <div class="card p-3 text-center action-card" onclick="switchTab('tab-pdf')">
+              <i class="ph ph-file-pdf text-danger fs-2 mb-1"></i>
+              <span class="fw-bold small d-block">PDF Notlar</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card p-3 text-center action-card" onclick="switchTab('tab-forum')">
+              <i class="ph ph-chats text-primary fs-2 mb-1"></i>
+              <span class="fw-bold small d-block">Öğrenci Forumu</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canlı Duyurular -->
+        <h6 class="fw-bold mb-2"><i class="ph ph-megaphone text-primary me-1"></i> Duyurular</h6>
+        <div id="announcementsList" class="d-flex flex-column gap-2 mb-3">
+          <div class="card p-3 text-center text-muted small">Duyurular yükleniyor...</div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DERSLER -->
+      <section id="tab-courses" class="tab-pane">
+        <h5 class="fw-bold mb-3"><i class="ph ph-books text-primary me-2"></i>Dersler ve Müfretad</h5>
+        <div class="input-group mb-3">
+          <span class="input-group-text bg-body border-end-0"><i class="ph ph-magnifying-glass"></i></span>
+          <input type="text" id="courseSearchInput" class="form-control border-start-0" placeholder="Ders adı veya kod ara...">
+        </div>
+        <div id="coursesList" class="d-flex flex-column gap-2">
+          <!-- Dinamik içerik -->
+        </div>
+      </section>
+
+      <!-- TAB 3: PDF / NOTLAR -->
+      <section id="tab-pdf" class="tab-pane">
+        <h5 class="fw-bold mb-3"><i class="ph ph-folder-open text-primary me-2"></i>PDF ve Çalışma Notları</h5>
+        <div id="pdfList" class="d-flex flex-column gap-2">
+          <!-- Dinamik içerik -->
+        </div>
+      </section>
+
+      <!-- TAB 4: FORUM -->
+      <section id="tab-forum" class="tab-pane">
+        <div class="card p-3 mb-3 d-flex justify-content-between align-items-center flex-row">
+          <div>
+            <h5 class="mb-1 fw-bold"><i class="ph ph-chats text-primary me-2"></i>Öğrenci Forumu</h5>
+            <p class="text-muted small mb-0">Sorularını sor, notlarını paylaş ve tartış!</p>
+          </div>
+          <button class="btn btn-primary btn-sm rounded-pill px-3" onclick="openModal('modal-new-topic')">
+            <i class="ph ph-plus-circle me-1"></i> Konu Aç
+          </button>
+        </div>
+
+        <!-- Kategori Filtreleri -->
+        <div class="forum-categories mb-3 d-flex gap-2 overflow-x-auto pb-2">
+          <button class="btn btn-sm btn-outline-primary active rounded-pill px-3" onclick="filterForum('hepsi', this)">Tümü</button>
+          <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="filterForum('genel', this)">💬 Genel</button>
+          <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="filterForum('cikmis-sorular', this)">❓ Çıkmış Sorular</button>
+          <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="filterForum('odevler', this)">💻 Ödevler</button>
+          <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="filterForum('sinavlar', this)">📝 Sınavlar</button>
+        </div>
+
+        <!-- Forum Gönderileri Listesi -->
+        <div id="forumPostsList" class="d-flex flex-column gap-3">
+          <div class="text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+            <div>Konular yükleniyor...</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <nav class="bottomnav">
+      <button class="nav-btn active" data-target="tab-home">
+        <i class="ph ph-house"></i>
+        <span>Ana Sayfa</span>
+      </button>
+      <button class="nav-btn" data-target="tab-courses">
+        <i class="ph ph-book-open"></i>
+        <span>Dersler</span>
+      </button>
+      <button class="nav-btn" data-target="tab-pdf">
+        <i class="ph ph-file-text"></i>
+        <span>PDF'ler</span>
+      </button>
+      <button class="nav-btn" data-target="tab-forum">
+        <i class="ph ph-chat-circle-dots"></i>
+        <span>Forum</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MODAL: YENİ KONU AÇMA -->
+  <div id="modal-new-topic" class="custom-modal">
+    <div class="modal-overlay" onclick="closeModal('modal-new-topic')"></div>
+    <div class="modal-sheet">
+      <div class="modal-header d-flex justify-content-between align-items-center mb-3">
+        <h5 class="modal-title fw-bold"><i class="ph ph-pencil-line me-2"></i>Yeni Konu Oluştur</h5>
+        <button class="btn-close" onclick="closeModal('modal-new-topic')"></button>
+      </div>
+      <form id="newTopicForm" onsubmit="handleCreateTopic(event)">
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Kategori</label>
+          <select class="form-select" id="topicCategory" required>
+            <option value="genel">💬 Genel Tartışma</option>
+            <option value="cikmis-sorular">❓ Çıkmış Sorular</option>
+            <option value="odevler">💻 Ödevler / Projeler</option>
+            <option value="sinavlar">📝 Vize & Final Sınavları</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Konu Başlığı</label>
+          <input type="text" class="form-field" id="topicTitle" placeholder="Örn: HTML5 Semantik Etiketler Sorusunun Cevabı" required maxlength="100">
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Açıklama / Detay</label>
+          <textarea class="form-field" id="topicContent" rows="4" placeholder="Soru veya düşüncelerini detaylıca yaz..." required></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">İsminiz (Opsiyonel)</label>
+          <input type="text" class="form-field" id="topicAuthor" placeholder="Anonim veya Adınız">
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 fw-bold">
+          <i class="ph ph-paper-plane-right me-1"></i> Konuyu Yayınla
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: KONU DETAY VE YORUMLAR -->
+  <div id="modal-topic-detail" class="custom-modal">
+    <div class="modal-overlay" onclick="closeModal('modal-topic-detail')"></div>
+    <div class="modal-sheet">
+      <div class="modal-header d-flex justify-content-between align-items-center mb-2">
+        <span class="badge bg-primary-subtle text-primary" id="detailCategory">Genel</span>
+        <button class="btn-close" onclick="closeModal('modal-topic-detail')"></button>
+      </div>
+      <h5 class="fw-bold mb-2" id="detailTitle">Konu Başlığı</h5>
+      <div class="d-flex align-items-center gap-2 mb-3 text-muted small">
+        <i class="ph ph-user-circle"></i> <span id="detailAuthor">Anonim</span> • 
+        <i class="ph ph-clock"></i> <span id="detailTime">Az önce</span>
+      </div>
+      <div class="card p-3 bg-body-tertiary mb-3 text-break" id="detailContent">
+        Konu içeriği buraya gelecek...
+      </div>
+
+      <h6 class="fw-bold mb-3"><i class="ph ph-chat-dots me-1"></i> Yorumlar (<span id="commentsCount">0</span>)</h6>
+      <div id="commentsList" class="d-flex flex-column gap-2 mb-3 max-h-60 overflow-y-auto">
+        <div class="text-muted small text-center py-3">Henüz yorum yapılmamış. İlk yorumu sen yap!</div>
+      </div>
+
+      <form id="commentForm" onsubmit="handleAddComment(event)" class="d-flex gap-2">
+        <input type="text" id="commentInput" class="form-field mb-0" placeholder="Bir yanıt yaz..." required>
+        <button type="submit" class="btn btn-primary px-3"><i class="ph ph-paper-plane-right"></i></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- UYGULAMA JAVASCRIPT KODLARI -->
+  <script>
+    // ==========================================
+    // FIREBASE YAPILANDIRMASI
+    // (Lütfen kendi Firebase anahtarlarınızla güncelleyin)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    // ==========================================
+    // UYGULAMA İÇİ NAVİGASYON & TEMA
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Tab Geçişleri
+      const navBtns = document.querySelectorAll('.nav-btn');
+      navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-target');
+          switchTab(target);
+        });
+      });
+
+      // Dark Mode Switcher
+      const darkBtn = document.getElementById('darkToggleBtn');
+      darkBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        darkBtn.innerHTML = newTheme === 'dark' ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-moon"></i>';
+      });
+
+      // Verileri Yükle
+      loadAnnouncements();
+      initForum();
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      const activePane = document.getElementById(tabId);
+      const activeBtn = document.querySelector(`.nav-btn[data-target="${tabId}"]`);
+
+      if (activePane) activePane.classList.add('active');
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('active');
+    }
+
+    // ==========================================
+    // FIRESTORE: ANA SAYFA DUYURULARI
+    // ==========================================
+    function loadAnnouncements() {
+      const container = document.getElementById('announcementsList');
+      if (!container) return;
+
+      db.collection('announcements')
+        .orderBy('date', 'desc')
+        .onSnapshot((snapshot) => {
+          if (snapshot.empty) {
+            container.innerHTML = `<div class="card p-3 text-center text-muted small">Henüz duyuru bulunmuyor.</div>`;
+            return;
+          }
+
+          let html = '';
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            html += `
+              <div class="card p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold small text-primary">${escapeHtml(data.title || 'Duyuru')}</span>
+                  <small class="text-muted" style="font-size:0.7rem;">${data.date || ''}</small>
+                </div>
+                <p class="small text-muted mb-0">${escapeHtml(data.content || '')}</p>
+              </div>
+            `;
+          });
+          container.innerHTML = html;
+        }, (err) => {
+          console.error("Duyuru çekme hatası:", err);
+          container.innerHTML = `<div class="card p-3 text-center text-danger small">Duyurular yüklenemedi.</div>`;
+        });
+    }
+
+    // ==========================================
+    // FORUM MODÜLÜ (FIREBASE FIRESTORE CANLI SENKRON)
+    // ==========================================
+    let activeForumFilter = 'hepsi';
+    let currentOpenTopicId = null;
+    let forumUnsubscribe = null;
+
+    function initForum() {
+      const postsContainer = document.getElementById('forumPostsList');
+      if (!postsContainer) return;
+
+      if (forumUnsubscribe) forumUnsubscribe();
+
+      forumUnsubscribe = db.collection('forum_topics')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot((snapshot) => {
+          if (snapshot.empty) {
+            postsContainer.innerHTML = `
+              <div class="card p-4 text-center text-muted">
+                <i class="ph ph-chat-teardrop-dots fs-1 mb-2 text-primary"></i>
+                <div>Henüz hiç konu açılmamış. İlk konuyu sen başlat!</div>
+              </div>`;
+            return;
+          }
+
+          let html = '';
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const id = doc.id;
+
+            if (activeForumFilter !== 'hepsi' && data.category !== activeForumFilter) return;
+
+            const timeAgo = data.createdAt ? formatTimeAgo(data.createdAt.toDate()) : 'Az önce';
+            const initial = (data.author || 'A').charAt(0).toUpperCase();
+
+            html += `
+              <div class="forum-card" onclick="openTopicDetail('${id}')">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="forum-avatar">${initial}</div>
+                    <div>
+                      <div class="fw-bold text-body small">${escapeHtml(data.author || 'Anonim Öğrenci')}</div>
+                      <div class="text-muted" style="font-size:0.75rem;">${timeAgo}</div>
+                    </div>
+                  </div>
+                  <span class="badge bg-primary-subtle text-primary forum-badge">${getCategoryName(data.category)}</span>
+                </div>
+                <h6 class="fw-bold mb-1 text-body">${escapeHtml(data.title)}</h6>
+                <p class="text-muted small mb-3 text-truncate-2">${escapeHtml(data.content)}</p>
+                <div class="d-flex align-items-center gap-3 text-muted small border-top pt-2" style="font-size:0.8rem;">
+                  <span onclick="likeTopic(event, '${id}')">
+                    <i class="ph ph-heart text-danger me-1"></i> <b>${data.likes || 0}</b> Beğeni
+                  </span>
+                  <span>
+                    <i class="ph ph-chat-circle-dots text-primary me-1"></i> ${data.commentsCount || 0} Yorum
+                  </span>
+                </div>
+              </div>
+            `;
+          });
+
+          postsContainer.innerHTML = html || `<div class="text-center text-muted py-3">Bu kategoride henüz konu yok.</div>`;
+        }, (error) => {
+          console.error("Forum çekme hatası:", error);
+          postsContainer.innerHTML = `<div class="text-danger text-center">Veriler yüklenirken bir hata oluştu.</div>`;
+        });
+    }
+
+    async function handleCreateTopic(e) {
+      e.preventDefault();
+      const category = document.getElementById('topicCategory').value;
+      const title = document.getElementById('topicTitle').value.trim();
+      const content = document.getElementById('topicContent').value.trim();
+      const author = document.getElementById('topicAuthor').value.trim() || 'Anonim Öğrenci';
+
+      if (!title || !content) return;
+
+      try {
+        await db.collection('forum_topics').add({
+          category,
+          title,
+          content,
+          author,
+          likes: 0,
+          commentsCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        document.getElementById('newTopicForm').reset();
+        closeModal('modal-new-topic');
+      } catch (err) {
+        alert("Konu yayınlanırken hata oluştu: " + err.message);
+      }
+    }
+
+    async function openTopicDetail(topicId) {
+      currentOpenTopicId = topicId;
+      openModal('modal-topic-detail');
+
+      const doc = await db.collection('forum_topics').doc(topicId).get();
+      if (!doc.exists) return;
+
+      const data = doc.data();
+      document.getElementById('detailTitle').innerText = data.title;
+      document.getElementById('detailAuthor').innerText = data.author || 'Anonim Öğrenci';
+      document.getElementById('detailCategory').innerText = getCategoryName(data.category);
+      document.getElementById('detailTime').innerText = data.createdAt ? formatTimeAgo(data.createdAt.toDate()) : 'Az önce';
+      document.getElementById('detailContent').innerText = data.content;
+
+      db.collection('forum_topics').doc(topicId).collection('comments')
+        .orderBy('createdAt', 'asc')
+        .onSnapshot((snapshot) => {
+          const commentsList = document.getElementById('commentsList');
+          document.getElementById('commentsCount').innerText = snapshot.size;
+
+          if (snapshot.empty) {
+            commentsList.innerHTML = `<div class="text-muted small text-center py-3">Henüz yorum yapılmamış. İlk yorumu sen yap!</div>`;
+            return;
+          }
+
+          let cHtml = '';
+          snapshot.forEach((cDoc) => {
+            const cData = cDoc.data();
+            cHtml += `
+              <div class="comment-bubble">
+                <div class="d-flex justify-content-between fw-bold mb-1" style="font-size:0.8rem;">
+                  <span>${escapeHtml(cData.author || 'Anonim')}</span>
+                  <span class="text-muted fw-normal" style="font-size:0.7rem;">${cData.createdAt ? formatTimeAgo(cData.createdAt.toDate()) : ''}</span>
+                </div>
+                <div>${escapeHtml(cData.text)}</div>
+              </div>`;
+          });
+          commentsList.innerHTML = cHtml;
+        });
+    }
+
+    async function handleAddComment(e) {
+      e.preventDefault();
+      if (!currentOpenTopicId) return;
+
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const topicRef = db.collection('forum_topics').doc(currentOpenTopicId);
+
+        await topicRef.collection('comments').add({
+          text,
+          author: 'Öğrenci',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        await topicRef.update({
+          commentsCount: firebase.firestore.FieldValue.increment(1)
+        });
+
+        input.value = '';
+      } catch (err) {
+        console.error("Yorum ekleme hatası:", err);
+      }
+    }
+
+    async function likeTopic(e, topicId) {
+      e.stopPropagation();
+      try {
+        const topicRef = db.collection('forum_topics').doc(topicId);
+        await topicRef.update({
+          likes: firebase.firestore.FieldValue.increment(1)
+        });
+      } catch (err) {
+        console.error("Beğeni hatası:", err);
+      }
+    }
+
+    function filterForum(category, btn) {
+      activeForumFilter = category;
+      document.querySelectorAll('.forum-categories button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      initForum();
+    }
+
+    function getCategoryName(cat) {
+      const categories = {
+        'genel': '💬 Genel',
+        'cikmis-sorular': '❓ Çıkmış Sorular',
+        'odevler': '💻 Ödevler',
+        'sinavlar': '📝 Sınavlar'
+      };
+      return categories[cat] || 'Genel';
+    }
+
+    function formatTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'Az önce';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes} dk önce`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} saat önce`;
+      return `${Math.floor(hours / 24)} gün önce`;
+    }
+
+    function escapeHtml(text) {
+      return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+    }
+  </script>
+</body>
+</html>
